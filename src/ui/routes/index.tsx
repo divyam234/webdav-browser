@@ -66,7 +66,7 @@ export const filesSplatRoute = createRoute({
   },
   loader: async ({ context: { queryClient }, preload, params }) => {
     if (preload) {
-      const path = extractPathParts((params as Record<string, string>)["*"])
+      const path = extractPathParts(params._splat)
       await queryClient.fetchQuery(filesQueryOptions(path))
     }
   },

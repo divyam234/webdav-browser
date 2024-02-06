@@ -38,7 +38,7 @@ const MyFileBrowser = () => {
 
   const params = route.useParams()
 
-  const path = extractPathParts((params as Record<string, string>)["*"])
+  const path = extractPathParts(params._splat)
 
   const { data: files } = useQuery(filesQueryOptions(path))
 
