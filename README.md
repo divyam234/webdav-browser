@@ -12,7 +12,7 @@ rclone serve webdav remote:  --allow-origin "*"
 
 ### Why Webdav not Remote Control API
 
-- Rclone Remote Control API doesn't use VFS cache for serving file so for listing files webdav api is used.
+- Rclone Remote Control API doesn't support VFS cache for serving file so for listing files webdav api is used.
 
 **If you want to server multiple remote use combine remote**
 
