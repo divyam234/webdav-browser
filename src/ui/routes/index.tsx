@@ -8,7 +8,6 @@ import {
   redirect,
   ScrollRestoration,
 } from "@tanstack/react-router"
-import { HTTPError } from "ky"
 
 import ErrorView from "@/ui/components/ErrorView"
 import HostForm from "@/ui/components/host-form"
@@ -63,13 +62,6 @@ export const filesSplatRoute = createRoute({
   },
   component: lazyRouteComponent(() => import("@/ui/components/FileBrowser")),
   errorComponent: ({ error }) => {
-    if (error instanceof HTTPError) {
-      const err =
-        error.response.status === 404
-          ? new Error("invalid path")
-          : new Error("server error")
-      return <ErrorView error={err} />
-    }
     return <ErrorView error={error as Error} />
   },
   loader: async ({ context: { queryClient }, preload, params }) => {

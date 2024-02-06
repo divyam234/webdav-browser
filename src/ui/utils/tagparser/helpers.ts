@@ -1,5 +1,3 @@
-import http from "@/ui/utils/http"
-
 function getBytes(buffer: ArrayBuffer, offset: number, count: number) {
   return new Uint8Array(buffer, offset, count)
 }
