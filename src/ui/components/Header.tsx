@@ -31,7 +31,7 @@ export default function Header() {
       <Toolbar sx={{ margin: "auto 0 auto 0" }}>
         <Grid container spacing={1} alignItems="center">
           <Grid item>
-            <Link to="/*" params={{ "*": "fs" }}>
+            <Link to="/$" params={{ _splat: "fs" }}>
               <Typography
                 color="inherit"
                 sx={{

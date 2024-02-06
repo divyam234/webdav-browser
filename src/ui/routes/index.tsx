@@ -38,8 +38,8 @@ const indexRoute = createRoute({
     const host = localStorage.getItem("WEBDAV_HOST")
     if (host)
       throw redirect({
-        to: "/*",
-        params: { "*": "fs" },
+        to: "/$",
+        params: { _splat: "fs" },
         replace: true,
       })
   },
@@ -48,7 +48,7 @@ const indexRoute = createRoute({
 
 export const filesSplatRoute = createRoute({
   getParentRoute: () => root,
-  path: "/*",
+  path: "/$",
   beforeLoad: async ({ location }) => {
     const host = localStorage.getItem("WEBDAV_HOST")
     if (!host)

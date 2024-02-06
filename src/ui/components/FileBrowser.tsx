@@ -27,7 +27,7 @@ import PreviewModal from "./PreviewModal"
 
 let firstRender = true
 
-const route = getRouteApi("/*")
+const route = getRouteApi("/$")
 
 function isVirtuosoList(value: any): value is VirtuosoHandle {
   return (value as VirtuosoHandle).getState !== undefined

@@ -48,9 +48,9 @@ export const usePreloadFiles = () => {
       const queryState = queryClient.getQueryState(["files", path])
 
       const nextRoute: NavigateOptions = {
-        to: "/*",
+        to: "/$",
         params: {
-          "*": `fs${path ? "/" : ""}${path}`,
+          _splat: `fs${path ? "/" : ""}${path}`,
         },
       }
       if (!queryState?.data) {
