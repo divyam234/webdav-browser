@@ -14,8 +14,12 @@ export default function HostForm() {
       e.preventDefault()
       const target = e.target as typeof e.target & {
         url: { value: string }
+        user: { value: string }
+        password: { value: string }
       }
       localStorage.setItem("WEBDAV_HOST", target.url.value)
+      localStorage.setItem("USER", target.user.value)
+      localStorage.setItem("PASS", target.password.value)
       window.location.href = redirect || "/fs"
     },
     [redirect]
@@ -57,6 +61,20 @@ export default function HostForm() {
             type="text"
             placeholder="http://127.0.0.1:8080"
             name="url"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            type="text"
+            placeholder="User"
+            name="user"
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            placeholder="Password"
+            name="password"
           />
           <Button type="submit" fullWidth variant="tonal" sx={{ mt: 3, mb: 2 }}>
             Set
