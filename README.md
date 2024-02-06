@@ -26,4 +26,4 @@ upstreams = drive=gdrive: onedrive=onedrive:
 rclone serve webdav combined:  --allow-origin "*"
 ```
 
-**Use this rclone https://github.com/divyam234/rclone.There is bug in original rclone libhttp for webdav in cors headers for now use this until its fixed.**
+**Use this [rclone](https://github.com/divyam234/rclone).There is bug in original rclone libhttp for webdav in cors headers for now use this until its fixed.**
