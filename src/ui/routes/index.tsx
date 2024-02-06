@@ -36,7 +36,7 @@ const indexRoute = createRoute({
   path: "/",
   validateSearch: (search) => search as { redirect?: string },
   beforeLoad: async () => {
-    const host = localStorage.getItem("RCD_HOST")
+    const host = localStorage.getItem("WEBDAV_HOST")
     if (host)
       throw redirect({
         to: "/*",
@@ -51,7 +51,7 @@ export const filesSplatRoute = createRoute({
   getParentRoute: () => root,
   path: "/*",
   beforeLoad: async ({ location }) => {
-    const host = localStorage.getItem("RCD_HOST")
+    const host = localStorage.getItem("WEBDAV_HOST")
     if (!host)
       throw redirect({
         to: "/",
@@ -74,10 +74,8 @@ export const filesSplatRoute = createRoute({
   },
   loader: async ({ context: { queryClient }, preload, params }) => {
     if (preload) {
-      const [remote, path] = extractPathParts(
-        (params as Record<string, string>)["*"]
-      )
-      await queryClient.fetchQuery(filesQueryOptions({ remote, path }))
+      const path = extractPathParts((params as Record<string, string>)["*"])
+      await queryClient.fetchQuery(filesQueryOptions(path))
     }
   },
 })

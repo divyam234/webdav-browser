@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import { useContext } from "react"
 import ColorModeContext from "@/ui/contexts/colorModeContext"
 import DarkIcon from "@mui/icons-material/DarkModeOutlined"
 import LightIcon from "@mui/icons-material/LightModeOutlined"

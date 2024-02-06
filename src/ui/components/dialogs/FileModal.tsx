@@ -1,5 +1,5 @@
-import React, { memo, useCallback } from "react"
-import { FileQueryParams, ModalState, SetValue } from "@/types"
+import { memo, useCallback } from "react"
+import { ModalState, SetValue } from "@/types"
 import Backdrop from "@mui/material/Backdrop"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -28,13 +28,13 @@ const StyledPaper = styled(Paper)({
 })
 
 type FileModalProps = {
-  filequeryParams: FileQueryParams
+  path: string
   modalState: ModalState
   setModalState: SetValue<ModalState>
 }
 
 export default memo(function FileModal({
-  filequeryParams,
+  path,
   modalState,
   setModalState,
 }: FileModalProps) {
@@ -42,14 +42,14 @@ export default memo(function FileModal({
     () => setModalState((prev) => ({ ...prev, open: false })),
     []
   )
-  const updateFile = useUpdateFile(filequeryParams)
+  const updateFile = useUpdateFile(path)
 
   const { file, open } = modalState
 
   const onUpdate = useCallback(() => {
     updateFile.mutate({
-      oldName: file?.name!,
-      newName: modalState.newName!,
+      oldName: file?.name as string,
+      newName: modalState.newName as string,
     })
     handleClose()
   }, [modalState.newName, file, handleClose])

@@ -1,5 +1,5 @@
-import React, { lazy, memo, Suspense, useCallback, useState } from "react"
-import { FileQueryParams, ModalState, SetValue } from "@/types"
+import { lazy, memo, Suspense, useCallback, useMemo, useState } from "react"
+import { ModalState, SetValue } from "@/types"
 import {
   ChonkyIconFA,
   ColorsLight,
@@ -36,7 +36,6 @@ const EpubPreview = lazy(() => import("./previews/EpubPreview"))
 const AudioPreview = lazy(() => import("./previews/audio/AudioPreview"))
 
 type PreviewModalProps = {
-  filequeryParams: FileQueryParams
   currentFile: FileData
   modalState: Partial<ModalState>
   setModalState: SetValue<ModalState>
@@ -94,7 +93,6 @@ const findPrev = (files: FileData[], fileId: string, previewType: string) => {
 }
 
 export default memo(function PreviewModal({
-  filequeryParams,
   currentFile,
   files,
   modalState,
@@ -130,7 +128,10 @@ export default memo(function PreviewModal({
     setModalState((prev) => ({ ...prev, open: false }))
   }, [])
 
-  const mediaUrl = getMediaUrl(filequeryParams, name)
+  const mediaUrl = useMemo(
+    () => getMediaUrl(previewFile.path),
+    [previewFile.path]
+  )
 
   const renderPreview = useCallback(() => {
     if (previewType) {

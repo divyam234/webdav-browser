@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { FileQueryParams, FileResponse } from "@/types"
+import { FileResponse } from "@/types"
 import {
   keepPreviousData,
   queryOptions,
@@ -7,29 +7,30 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { NavigateOptions, useRouter } from "@tanstack/react-router"
+import { FileStat } from "webdav"
 
 import { useProgress } from "@/ui/components/TopProgress"
 
 import { getExtension } from "./common"
-import http from "./http"
 import { getPreviewType } from "./previewType"
+import { webdav } from "./webdav"
 
-export const filesQueryOptions = (params: FileQueryParams) => {
+export const filesQueryOptions = (path: string) => {
   return queryOptions({
-    queryKey: ["files", params],
-    queryFn: async ({ signal }) => await fetchFiles(params, signal),
+    queryKey: ["files", path],
+    queryFn: async () => await fetchFiles(path),
     placeholderData: keepPreviousData,
     select: (data) =>
-      data.list.map((item) => ({
-        id: item.ID,
-        name: item.Name,
-        mimeType: item.ModTime,
-        size: item.Size,
-        modDate: item.ModTime,
-        path: item.Path,
-        isDir: item.IsDir,
-        previewType: getPreviewType(getExtension(item.Name), {
-          video: item.MimeType.includes("video"),
+      data.map((item) => ({
+        id: item.basename,
+        name: item.basename,
+        mimeType: item.mime,
+        size: item.size,
+        modDate: item.lastmod,
+        path: item.filename,
+        isDir: item.type !== "file",
+        previewType: getPreviewType(getExtension(item.filename), {
+          video: item.mime?.includes("video"),
         }),
       })),
   })
@@ -43,13 +44,13 @@ export const usePreloadFiles = () => {
   const { startProgress, stopProgress } = useProgress()
 
   const preloadFiles = useCallback(
-    async (params: FileQueryParams) => {
-      const queryState = queryClient.getQueryState(["files", params])
+    async (path: string) => {
+      const queryState = queryClient.getQueryState(["files", path])
 
       const nextRoute: NavigateOptions = {
         to: "/*",
         params: {
-          "*": `fs/${params.remote}${params.path ? "/" + params.path : ""}`,
+          "*": `fs${path ? "/" : ""}${path}`,
         },
       }
       if (!queryState?.data) {
@@ -68,48 +69,21 @@ export const usePreloadFiles = () => {
   return preloadFiles
 }
 
-export const fetchFiles = async (
-  params: FileQueryParams,
-  signal: AbortSignal
-) => {
-  if (params.remote === "") {
-    const res = await http
-      .post("config/listremotes", { signal })
-      .json<{ remotes: string[] }>()
-    return {
-      list: res.remotes.map((remote) => ({
-        ID: remote,
-        Name: remote,
-        Size: -1,
-        MimeType: "node/directory",
-        ModTime: new Date().toISOString(),
-        IsDir: true,
-        Path: remote,
-      })),
-    }
-  }
+export const fetchFiles = async (path: string) => {
+  const res = (await webdav.getDirectoryContents(path)) as FileStat[]
 
-  return await http
-    .post("operations/list", {
-      json: { fs: params.remote + ":", remote: params.path },
-      signal,
-    })
-    .json<FileResponse>()
+  return res
 }
 
-export const useUpdateFile = (params: FileQueryParams) => {
-  const queryKey = ["files", params]
+export const useUpdateFile = (path: string) => {
+  const queryKey = ["files", path]
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: { oldName: string; newName: string }) =>
-      http.post("operations/movefile", {
-        json: {
-          srcFs: params.remote + ":",
-          dstFs: params.remote + ":",
-          srcRemote: `${params.path ? params.path + "/" : ""}${payload.oldName}`,
-          dstRemote: `${params.path ? params.path + "/" : ""}${payload.newName}`,
-        },
-      }),
+      webdav.moveFile(
+        path + "/" + payload.oldName,
+        path + "/" + payload.newName
+      ),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey })
       const previousFiles = queryClient.getQueryData<FileResponse>(queryKey)
@@ -137,23 +111,17 @@ export const useUpdateFile = (params: FileQueryParams) => {
   })
 }
 
-export const useDeleteFile = (params: FileQueryParams) => {
-  const queryKey = ["files", params]
+export const useDeleteFile = (path: string) => {
+  const queryKey = ["files", path]
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (name: string) =>
-      http.post("operations/purge", {
-        json: {
-          fs: params.remote + ":",
-          remote: `${params.path ? params.path + "/" : ""}${name}`,
-        },
-      }),
+    mutationFn: async (path: string) => webdav.deleteFile(path),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey })
       const previousFiles = queryClient.getQueryData(queryKey)
-      queryClient.setQueryData<Partial<FileResponse>>(queryKey, (prev) => ({
-        list: prev?.list?.filter((val) => val.Name !== variables),
-      }))
+      queryClient.setQueryData<FileStat[]>(queryKey, (prev) =>
+        prev?.filter((val) => val.filename !== variables)
+      )
       return { previousFiles }
     },
     onError: (err, variables, context) => {

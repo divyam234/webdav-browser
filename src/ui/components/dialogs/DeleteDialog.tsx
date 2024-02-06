@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { FileQueryParams, ModalState, SetValue } from "@/types"
+import { ModalState, SetValue } from "@/types"
 import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
@@ -12,18 +12,18 @@ import { useDeleteFile } from "@/ui/utils/queryOptions"
 type DeleteDialogProps = {
   modalState: ModalState
   setModalState: SetValue<ModalState>
-  filequeryParams: FileQueryParams
+  path: string
 }
 export default function DeleteDialog({
   modalState,
   setModalState,
-  filequeryParams,
+  path,
 }: DeleteDialogProps) {
-  const deleteFiles = useDeleteFile(filequeryParams)
+  const deleteFiles = useDeleteFile(path)
 
   const handleClose = useCallback((denyDelete = true) => {
     if (!denyDelete) {
-      deleteFiles.mutate(modalState.selectedFiles?.at(0)?.name!)
+      deleteFiles.mutate(modalState.selectedFiles?.at(0)?.path)
     }
     setModalState((prev) => ({ ...prev, open: false }))
   }, [])
@@ -44,9 +44,7 @@ export default function DeleteDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={() => handleClose()}>No</Button>
-        <Button onClick={() => handleClose(false)} autoFocus>
-          Yes
-        </Button>
+        <Button onClick={() => handleClose(false)}>Yes</Button>
       </DialogActions>
     </Dialog>
   )

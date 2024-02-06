@@ -1,4 +1,3 @@
-import * as React from "react"
 import { ErrorOutline } from "@mui/icons-material"
 import { Box, Button, Typography } from "@mui/material"
 

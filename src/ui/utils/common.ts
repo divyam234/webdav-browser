@@ -1,5 +1,3 @@
-import { FileQueryParams } from "@/types"
-
 export const navigateToExternalUrl = (url: string, shouldOpenNewTab = true) =>
   shouldOpenNewTab ? window.open(url, "_blank") : (window.location.href = url)
 
@@ -18,19 +16,15 @@ export const isMobileDevice = () => {
   })
 }
 
-export const chainLinks = (path: string, remote: string) => {
+export const chainLinks = (path: string) => {
   const obj: Record<string, string> = { root: "" }
-  if (!remote) {
+  if (!path) {
     return { root: "" }
   }
-  obj[remote] = ""
-  if (!path && remote) {
-    return obj
-  }
-  let pathsoFar = ""
+  let pathsoFar = "/"
   const paths = path.split("/")
-  for (let path of paths) {
-    let decodedPath = decodeURIComponent(path)
+  for (const path of paths) {
+    const decodedPath = decodeURIComponent(path)
     obj[decodedPath] = pathsoFar + decodedPath
     pathsoFar = pathsoFar + decodedPath + "/"
   }
@@ -48,9 +42,9 @@ export function getExtension(fileName: string) {
 export const zeroPad = (num: number | string, places: number) =>
   String(num).padStart(places, "0")
 
-export const getMediaUrl = (params: FileQueryParams, name: string) => {
-  const host = "http://127.0.0.1:5572"
-  return `${host}/[${params.remote}:${encodeURIComponent(params.path)}]/${encodeURIComponent(name)}`
+export const getMediaUrl = (path: string) => {
+  const host = localStorage.getItem("WEBDAV_HOST") || "http://127.0.0.1:8080"
+  return `${host}/${path}`
 }
 
 export const getParams = (fullPath: string) => {
@@ -65,16 +59,14 @@ export function formatDuration(value: number) {
   return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`
 }
 
-export function extractPathParts(path: string): [string, string] {
+export function extractPathParts(path: string): string {
   const parts = decodeURIComponent(path).split("/")
 
   parts.shift()
 
-  const firstPart = parts.shift() || ""
-
   const restOfPath = parts.join("/")
 
-  return [firstPart, restOfPath]
+  return restOfPath
 }
 
 export function encode(str: string) {
@@ -100,7 +92,7 @@ export function omit<T extends Record<string, any>, K extends Array<keyof T>>(
   ...props: K
 ): Omit<T, K[number]> {
   const newObj = Object.assign({}, obj)
-  for (let prop of props) delete newObj[prop]
+  for (const prop of props) delete newObj[prop]
 
   return newObj as Omit<T, K[number]>
 }

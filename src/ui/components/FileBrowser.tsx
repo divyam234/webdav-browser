@@ -36,28 +36,23 @@ function isVirtuosoList(value: any): value is VirtuosoHandle {
 const MyFileBrowser = () => {
   const positions = useRef<Map<string, StateSnapshot>>(new Map()).current
 
-  const rparams = route.useParams()
+  const params = route.useParams()
 
-  const [remote, path] = extractPathParts((rparams as any)["*"])
+  const path = extractPathParts((params as Record<string, string>)["*"])
 
-  const params = {
-    remote,
-    path,
-  }
-
-  const { data: files } = useQuery(filesQueryOptions(params))
+  const { data: files } = useQuery(filesQueryOptions(path))
 
   const listRef = useRef<VirtuosoHandle | VirtuosoGridHandle>(null)
 
   const folderChain = useMemo(() => {
-    return Object.entries(chainLinks(path, remote)).map(([key, value]) => ({
+    return Object.entries(chainLinks(path)).map(([key, value]) => ({
       id: key,
       name: key,
       path: value,
       isDir: true,
       chain: true,
     }))
-  }, [remote, path])
+  }, [path])
 
   const [modalState, setModalState] = useState<ModalState>({
     open: false,
@@ -65,7 +60,7 @@ const MyFileBrowser = () => {
 
   const { fileActions, chonkyActionHandler } = useFileAction(
     setModalState,
-    params
+    path
   )
 
   useEffect(() => {
@@ -76,18 +71,16 @@ const MyFileBrowser = () => {
 
     setTimeout(() => {
       listRef.current?.scrollTo({
-        top: positions.get(remote + path)?.scrollTop ?? 0,
+        top: positions.get(path)?.scrollTop ?? 0,
         left: 0,
       })
     }, 0)
 
     return () => {
       if (listRef.current && isVirtuosoList(listRef.current))
-        listRef.current?.getState((state) =>
-          positions.set(remote + path, state)
-        )
+        listRef.current?.getState((state) => positions.set(path, state))
     }
-  }, [remote, path])
+  }, [path])
 
   const actions = useMemo(
     () =>
@@ -116,7 +109,7 @@ const MyFileBrowser = () => {
       {fileActions.RenameFile.id === modalState.operation &&
         modalState.open && (
           <FileModal
-            filequeryParams={params}
+            path={path}
             modalState={modalState}
             setModalState={setModalState}
           />
@@ -126,7 +119,6 @@ const MyFileBrowser = () => {
           <PreviewModal
             files={files}
             currentFile={modalState.file!}
-            filequeryParams={params}
             modalState={modalState}
             setModalState={setModalState}
           />
@@ -134,7 +126,7 @@ const MyFileBrowser = () => {
       {modalState.operation === fileActions.DeleteFile.id &&
         modalState.open && (
           <DeleteDialog
-            filequeryParams={params}
+            path={path}
             modalState={modalState}
             setModalState={setModalState}
           />

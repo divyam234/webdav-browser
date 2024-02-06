@@ -15,7 +15,7 @@ export default function HostForm() {
       const target = e.target as typeof e.target & {
         url: { value: string }
       }
-      localStorage.setItem("RCD_HOST", target.url.value)
+      localStorage.setItem("WEBDAV_HOST", target.url.value)
       window.location.href = redirect || "/fs"
     },
     [redirect]
@@ -36,7 +36,7 @@ export default function HostForm() {
         }}
       >
         <Typography component="h1" variant="h5">
-          Rcd Url
+          WebDav Url
         </Typography>
         <Box
           component="form"
@@ -52,9 +52,10 @@ export default function HostForm() {
           <TextField
             margin="normal"
             required
+            defaultValue={"http://127.0.0.1:8080"}
             fullWidth
             type="text"
-            placeholder="http://127.0.0.1:5572"
+            placeholder="http://127.0.0.1:8080"
             name="url"
           />
           <Button type="submit" fullWidth variant="tonal" sx={{ mt: 3, mb: 2 }}>

@@ -1,12 +1,11 @@
 import { useCallback, useMemo } from "react"
-import { FileQueryParams, ModalState, SetValue } from "@/types"
+import { ModalState, SetValue } from "@/types"
 import {
   ChonkyActions,
   ChonkyActionUnion,
   ChonkyIconName,
   CustomVisibilityState,
   defineFileAction,
-  FileHelper,
   MapFileActionsToData,
 } from "@bhunter179/chonky"
 
@@ -14,7 +13,7 @@ import { getMediaUrl, navigateToExternalUrl } from "@/ui/utils/common"
 import { preview } from "@/ui/utils/previewType"
 import { usePreloadFiles } from "@/ui/utils/queryOptions"
 
-export const CustomActions = (remote: string) => ({
+export const CustomActions = (path: string) => ({
   DownloadFile: defineFileAction({
     id: "download_file",
     requiresSelection: true,
@@ -34,7 +33,7 @@ export const CustomActions = (remote: string) => ({
       icon: ChonkyIconName.rename,
     },
     customVisibility: () =>
-      !remote ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
+      !path ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
   }),
   DeleteFile: defineFileAction({
     id: "delete_file",
@@ -45,7 +44,7 @@ export const CustomActions = (remote: string) => ({
       icon: ChonkyIconName.trash,
     },
     customVisibility: () =>
-      !remote ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
+      !path ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
   }),
   OpenInVLCPlayer: defineFileAction({
     id: "open_vlc_player",
@@ -82,13 +81,11 @@ export const CustomActions = (remote: string) => ({
 
 export const useFileAction = (
   setModalState: SetValue<ModalState>,
-  params: FileQueryParams
+  path: string
 ) => {
-  const { remote, path } = params
-
   const preloadFiles = usePreloadFiles()
 
-  const fileActions = useMemo(() => CustomActions(remote), [remote])
+  const fileActions = useMemo(() => CustomActions(path), [path])
 
   const chonkyActionHandler = useCallback(
     async (data: MapFileActionsToData<ChonkyActionUnion>) => {
@@ -100,8 +97,8 @@ export const useFileAction = (
 
           if (fileToOpen.isDir) {
             fileToOpen.id === "root"
-              ? preloadFiles({ remote: "", path: "" })
-              : preloadFiles({ ...params, path: fileToOpen.path })
+              ? preloadFiles("")
+              : preloadFiles(fileToOpen.path)
           } else if (!fileToOpen.isDir && fileToOpen.previewType in preview) {
             setModalState({
               open: true,
@@ -115,16 +112,14 @@ export const useFileAction = (
           const { selectedFiles } = data.state
           for (const file of selectedFiles) {
             if (!file.isDir) {
-              const url = getMediaUrl(params, file.name)
-              navigateToExternalUrl(url, false)
+              navigateToExternalUrl(getMediaUrl(file.path), false)
             }
           }
           break
         }
         case fileActions.OpenInVLCPlayer.id: {
           const { selectedFiles } = data.state
-          const fileToOpen = selectedFiles[0]
-          const url = `vlc://${getMediaUrl(params, fileToOpen.name)}`
+          const url = `vlc://${getMediaUrl(selectedFiles[0].path)}`
           navigateToExternalUrl(url, false)
           break
         }
@@ -156,9 +151,8 @@ export const useFileAction = (
           const selections = data.state.selectedFilesForAction
           let clipboardText = ""
           selections.forEach((element) => {
-            if (!FileHelper.isDirectory(element)) {
-              const { id, name } = element
-              clipboardText = `${clipboardText}${getMediaUrl(params, name)}\n`
+            if (!element.isDir) {
+              clipboardText = `${clipboardText}${getMediaUrl(element.path)}\n`
             }
           })
           navigator.clipboard.writeText(clipboardText)
@@ -168,7 +162,7 @@ export const useFileAction = (
           break
       }
     },
-    [remote, path]
+    [path, fileActions]
   )
 
   return { fileActions, chonkyActionHandler }
