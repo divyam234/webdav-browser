@@ -17,7 +17,7 @@ import {
   type VirtuosoHandle,
 } from "react-virtuoso"
 
-import { useFileAction } from "@/ui/hooks/useFileAction"
+import { CustomActions, useFileAction } from "@/ui/hooks/useFileAction"
 import { chainLinks, extractPathParts } from "@/ui/utils/common"
 import { filesQueryOptions } from "@/ui/utils/queryOptions"
 
@@ -58,10 +58,7 @@ const MyFileBrowser = () => {
     open: false,
   })
 
-  const { fileActions, chonkyActionHandler } = useFileAction(
-    setModalState,
-    path
-  )
+  const { chonkyActionHandler } = useFileAction(setModalState, path)
 
   useEffect(() => {
     if (firstRender) {
@@ -84,10 +81,10 @@ const MyFileBrowser = () => {
 
   const actions = useMemo(
     () =>
-      Object.keys(fileActions).map(
-        (x) => fileActions[x as keyof typeof fileActions]
+      Object.keys(CustomActions).map(
+        (x) => CustomActions[x as keyof typeof CustomActions]
       ),
-    [fileActions]
+    []
   )
 
   return (
@@ -106,7 +103,7 @@ const MyFileBrowser = () => {
         <FileList ref={listRef} />
         <FileContextMenu />
       </FileBrowser>
-      {fileActions.RenameFile.id === modalState.operation &&
+      {CustomActions.RenameFile.id === modalState.operation &&
         modalState.open && (
           <FileModal
             path={path}
@@ -123,7 +120,7 @@ const MyFileBrowser = () => {
             setModalState={setModalState}
           />
         )}
-      {modalState.operation === fileActions.DeleteFile.id &&
+      {modalState.operation === CustomActions.DeleteFile.id &&
         modalState.open && (
           <DeleteDialog
             path={path}

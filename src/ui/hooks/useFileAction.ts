@@ -1,10 +1,9 @@
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { ModalState, SetValue } from "@/types"
 import {
   ChonkyActions,
   ChonkyActionUnion,
   ChonkyIconName,
-  CustomVisibilityState,
   defineFileAction,
   MapFileActionsToData,
 } from "@bhunter179/chonky"
@@ -13,7 +12,7 @@ import { getMediaUrl, navigateToExternalUrl } from "@/ui/utils/common"
 import { preview } from "@/ui/utils/previewType"
 import { usePreloadFiles } from "@/ui/utils/queryOptions"
 
-export const CustomActions = (path: string) => ({
+export const CustomActions = {
   DownloadFile: defineFileAction({
     id: "download_file",
     requiresSelection: true,
@@ -32,8 +31,6 @@ export const CustomActions = (path: string) => ({
       contextMenu: true,
       icon: ChonkyIconName.rename,
     },
-    customVisibility: () =>
-      !path ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
   }),
   DeleteFile: defineFileAction({
     id: "delete_file",
@@ -43,8 +40,6 @@ export const CustomActions = (path: string) => ({
       contextMenu: true,
       icon: ChonkyIconName.trash,
     },
-    customVisibility: () =>
-      !path ? CustomVisibilityState.Hidden : CustomVisibilityState.Default,
   }),
   OpenInVLCPlayer: defineFileAction({
     id: "open_vlc_player",
@@ -77,15 +72,13 @@ export const CustomActions = (path: string) => ({
   //       icon: ChonkyIconName.folderCreate,
   //     },
   //   }),
-})
+}
 
 export const useFileAction = (
   setModalState: SetValue<ModalState>,
   path: string
 ) => {
   const preloadFiles = usePreloadFiles()
-
-  const fileActions = useMemo(() => CustomActions(path), [path])
 
   const chonkyActionHandler = useCallback(
     async (data: MapFileActionsToData<ChonkyActionUnion>) => {
@@ -108,7 +101,7 @@ export const useFileAction = (
           }
           break
         }
-        case fileActions.DownloadFile.id: {
+        case CustomActions.DownloadFile.id: {
           const { selectedFiles } = data.state
           for (const file of selectedFiles) {
             if (!file.isDir) {
@@ -117,25 +110,25 @@ export const useFileAction = (
           }
           break
         }
-        case fileActions.OpenInVLCPlayer.id: {
+        case CustomActions.OpenInVLCPlayer.id: {
           const { selectedFiles } = data.state
           const url = `vlc://${getMediaUrl(selectedFiles[0].path)}`
           navigateToExternalUrl(url, false)
           break
         }
-        case fileActions.RenameFile.id: {
+        case CustomActions.RenameFile.id: {
           setModalState({
             open: true,
             file: data.state.selectedFiles[0],
-            operation: fileActions.RenameFile.id,
+            operation: CustomActions.RenameFile.id,
           })
           break
         }
-        case fileActions.DeleteFile.id: {
+        case CustomActions.DeleteFile.id: {
           setModalState({
             open: true,
             selectedFiles: data.state.selectedFiles,
-            operation: fileActions.DeleteFile.id,
+            operation: CustomActions.DeleteFile.id,
           })
           break
         }
@@ -147,7 +140,7 @@ export const useFileAction = (
           break
         }
 
-        case fileActions.CopyDownloadLink.id: {
+        case CustomActions.CopyDownloadLink.id: {
           const selections = data.state.selectedFilesForAction
           let clipboardText = ""
           selections.forEach((element) => {
@@ -162,8 +155,8 @@ export const useFileAction = (
           break
       }
     },
-    [path, fileActions]
+    [path]
   )
 
-  return { fileActions, chonkyActionHandler }
+  return { chonkyActionHandler }
 }
