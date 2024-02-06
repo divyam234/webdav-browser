@@ -41,7 +41,7 @@ export default function Header() {
                   textDecoration: "none",
                 }}
               >
-                Rclone Browser
+                Webdav Browser
               </Typography>
             </Link>
           </Grid>
