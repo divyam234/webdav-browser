@@ -38,9 +38,11 @@ const MyFileBrowser = () => {
 
   const params = route.useParams()
 
+  const { webdav } = route.useRouteContext()
+
   const path = extractPathParts(params._splat)
 
-  const { data: files } = useQuery(filesQueryOptions(path))
+  const { data: files } = useQuery(filesQueryOptions(webdav, path))
 
   const listRef = useRef<VirtuosoHandle | VirtuosoGridHandle>(null)
 
@@ -106,6 +108,7 @@ const MyFileBrowser = () => {
       {CustomActions.RenameFile.id === modalState.operation &&
         modalState.open && (
           <FileModal
+            webdav={webdav}
             path={path}
             modalState={modalState}
             setModalState={setModalState}
@@ -123,6 +126,7 @@ const MyFileBrowser = () => {
       {modalState.operation === CustomActions.DeleteFile.id &&
         modalState.open && (
           <DeleteDialog
+            webdav={webdav}
             path={path}
             modalState={modalState}
             setModalState={setModalState}

@@ -37,3 +37,9 @@ export interface FileQueryParams {
 export type SetValue<T> = Dispatch<SetStateAction<T>>
 
 export type JsonObject = Record<string, unknown>
+
+export interface Settings {
+  host: string
+  user?: string
+  pass?: string
+}

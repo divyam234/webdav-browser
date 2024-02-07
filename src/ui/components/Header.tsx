@@ -3,6 +3,7 @@ import ColorModeContext from "@/ui/contexts/colorModeContext"
 import DarkIcon from "@mui/icons-material/DarkModeOutlined"
 import LightIcon from "@mui/icons-material/LightModeOutlined"
 import RestartIcon from "@mui/icons-material/RefreshOutlined"
+import SettingsIcon from "@mui/icons-material/Settings"
 import { Grid, Tooltip, Typography } from "@mui/material"
 import AppBar from "@mui/material/AppBar"
 import IconButton from "@mui/material/IconButton"
@@ -72,6 +73,16 @@ export default function Header() {
             <Tooltip title="Reset">
               <IconButton size="large" color="inherit" onClick={resetTheme}>
                 <RestartIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton
+                component={Link}
+                size="large"
+                color="inherit"
+                to="/settings"
+              >
+                <SettingsIcon />
               </IconButton>
             </Tooltip>
           </Grid>

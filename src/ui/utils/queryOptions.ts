@@ -7,18 +7,18 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { NavigateOptions, useRouter } from "@tanstack/react-router"
-import { FileStat } from "webdav"
+import { FileStat, WebDAVClient } from "webdav"
 
 import { useProgress } from "@/ui/components/TopProgress"
 
 import { getExtension } from "./common"
 import { getPreviewType } from "./previewType"
-import { webdav } from "./webdav"
 
-export const filesQueryOptions = (path: string) => {
+export const filesQueryOptions = (webdav: WebDAVClient, path: string) => {
   return queryOptions({
     queryKey: ["files", path],
-    queryFn: async () => await fetchFiles(path),
+    queryFn: async () =>
+      (await webdav.getDirectoryContents(path)) as FileStat[],
     placeholderData: keepPreviousData,
     select: (data) =>
       data.map((item) => ({
@@ -69,13 +69,7 @@ export const usePreloadFiles = () => {
   return preloadFiles
 }
 
-export const fetchFiles = async (path: string) => {
-  const res = (await webdav.getDirectoryContents(path)) as FileStat[]
-
-  return res
-}
-
-export const useUpdateFile = (path: string) => {
+export const useUpdateFile = (webdav: WebDAVClient, path: string) => {
   const queryKey = ["files", path]
   const queryClient = useQueryClient()
   return useMutation({
@@ -111,7 +105,7 @@ export const useUpdateFile = (path: string) => {
   })
 }
 
-export const useDeleteFile = (path: string) => {
+export const useDeleteFile = (webdav: WebDAVClient, path: string) => {
   const queryKey = ["files", path]
   const queryClient = useQueryClient()
   return useMutation({

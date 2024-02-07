@@ -4,10 +4,16 @@ import Button from "@mui/material/Button"
 import Container from "@mui/material/Container"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
-import { useSearch } from "@tanstack/react-router"
+import { getRouteApi } from "@tanstack/react-router"
+
+const routeApi = getRouteApi("/settings")
 
 export default function HostForm() {
-  const { redirect } = useSearch({ from: "/" })
+  const { redirect } = routeApi.useSearch()
+
+  const context = routeApi.useRouteContext()
+
+  const [settings, setSettings] = context.settings
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,12 +23,14 @@ export default function HostForm() {
         user: { value: string }
         password: { value: string }
       }
-      localStorage.setItem("WEBDAV_HOST", target.url.value)
-      localStorage.setItem("USER", target.user.value)
-      localStorage.setItem("PASS", target.password.value)
+      setSettings({
+        host: target.url.value,
+        user: target.user.value,
+        pass: target.password.value,
+      })
       window.location.href = redirect || "/fs"
     },
-    [redirect]
+    [redirect, setSettings]
   )
 
   return (
@@ -56,7 +64,7 @@ export default function HostForm() {
           <TextField
             margin="normal"
             required
-            defaultValue={"http://127.0.0.1:8080"}
+            defaultValue={settings.host}
             fullWidth
             type="text"
             placeholder="http://127.0.0.1:8080"
@@ -66,13 +74,14 @@ export default function HostForm() {
             margin="normal"
             fullWidth
             type="text"
+            defaultValue={settings.user}
             placeholder="User"
             name="user"
           />
           <TextField
             margin="normal"
-            required
             fullWidth
+            defaultValue={settings.pass}
             placeholder="Password"
             name="password"
           />
