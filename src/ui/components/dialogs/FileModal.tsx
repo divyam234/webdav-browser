@@ -9,7 +9,6 @@ import Paper from "@mui/material/Paper"
 import { styled } from "@mui/material/styles"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import { WebDAVClient } from "webdav"
 
 import { useUpdateFile } from "@/ui/utils/queryOptions"
 
@@ -32,20 +31,18 @@ type FileModalProps = {
   path: string
   modalState: ModalState
   setModalState: SetValue<ModalState>
-  webdav: WebDAVClient
 }
 
 export default memo(function FileModal({
   path,
   modalState,
   setModalState,
-  webdav,
 }: FileModalProps) {
   const handleClose = useCallback(
     () => setModalState((prev) => ({ ...prev, open: false })),
     []
   )
-  const updateFile = useUpdateFile(webdav, path)
+  const updateFile = useUpdateFile(path)
 
   const { file, open } = modalState
 

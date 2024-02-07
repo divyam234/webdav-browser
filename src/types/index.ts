@@ -29,7 +29,11 @@ export interface AudioMetadata {
   title: string
   cover: string
 }
-export type Tags = Record<string, any>
+export type Tags = {
+  artist: string
+  title: string
+  picture: Blob
+}
 export interface FileQueryParams {
   remote: string
   path: string

@@ -27,6 +27,7 @@
     "react-reader": "^2.0.4",
     "react-top-loading-bar": "^2.3.1",
     "react-virtuoso": "^4.6.3",
+    "redaxios": "^0.5.1",
     "usehooks-ts": "^2.13.0",
     "webdav": "^5.3.2"
   },

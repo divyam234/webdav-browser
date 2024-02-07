@@ -144,10 +144,10 @@ const AudioPreview: FC<{
   useEffect(() => {
     if (mediaUrl) {
       parseAudioMetadata(mediaUrl).then((tags) => {
-        let { artist, title, picture } = tags as Tags
+        const { artist, title, picture } = tags as Tags
         let cover = defaultCover
         if (picture) {
-          cover = URL.createObjectURL(picture as unknown as Blob)
+          cover = URL.createObjectURL(picture)
         }
         setMetadata({
           artist: artist ? artist : "Unkown artist",

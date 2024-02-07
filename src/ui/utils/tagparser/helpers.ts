@@ -1,3 +1,5 @@
+import { http } from "../http"
+
 function getBytes(buffer: ArrayBuffer, offset: number, count: number) {
   return new Uint8Array(buffer, offset, count)
 }
@@ -33,10 +35,11 @@ function decode(bytes: Uint8Array, encoding: string = "utf-8") {
 }
 
 async function getBuffer(url: string, size?: number): Promise<ArrayBuffer> {
-  const response = await fetch(url, {
+  const response = await http.get(url, {
     headers: { Range: `bytes=${0}-${size}` },
+    responseType: "arrayBuffer",
   })
-  return response.arrayBuffer()
+  return response.data
 }
 
 export { getBytes, sliceBytes, unpackBytes, decode, getBuffer }

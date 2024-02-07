@@ -6,7 +6,6 @@ import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
-import type { WebDAVClient } from "webdav"
 
 import { useDeleteFile } from "@/ui/utils/queryOptions"
 
@@ -14,15 +13,13 @@ type DeleteDialogProps = {
   modalState: ModalState
   setModalState: SetValue<ModalState>
   path: string
-  webdav: WebDAVClient
 }
 export default function DeleteDialog({
-  webdav,
   modalState,
   setModalState,
   path,
 }: DeleteDialogProps) {
-  const deleteFiles = useDeleteFile(webdav, path)
+  const deleteFiles = useDeleteFile(path)
 
   const handleClose = useCallback((denyDelete = true) => {
     if (!denyDelete) {

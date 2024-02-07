@@ -9,7 +9,6 @@ import {
   redirect,
   ScrollRestoration,
 } from "@tanstack/react-router"
-import { WebDAVClient } from "webdav"
 
 import ErrorView from "@/ui/components/ErrorView"
 import HostForm from "@/ui/components/host-form"
@@ -28,7 +27,6 @@ const RootComponent = () => {
 export const root = createRootRouteWithContext<{
   queryClient: QueryClient
   settings: [Settings, SetValue<Settings>]
-  webdav: WebDAVClient
 }>()({
   component: RootComponent,
   wrapInSuspense: true,
@@ -71,10 +69,10 @@ export const filesSplatRoute = createRoute({
   errorComponent: ({ error }) => {
     return <ErrorView error={error as Error} />
   },
-  loader: async ({ context: { queryClient, webdav }, preload, params }) => {
+  loader: async ({ context: { queryClient }, preload, params }) => {
     if (preload) {
       const path = extractPathParts(params._splat)
-      await queryClient.fetchQuery(filesQueryOptions(webdav, path))
+      await queryClient.fetchQuery(filesQueryOptions(path))
     }
   },
 })
