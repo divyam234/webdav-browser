@@ -30,9 +30,10 @@ export interface AudioMetadata {
   cover: string
 }
 export type Tags = {
-  artist: string
-  title: string
-  picture: Blob
+  artist?: string
+  title?: string
+  picture?: Blob
+  [key: string]: any
 }
 export interface FileQueryParams {
   remote: string
