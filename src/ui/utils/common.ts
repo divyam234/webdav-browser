@@ -42,11 +42,6 @@ export function getExtension(fileName: string) {
 export const zeroPad = (num: number | string, places: number) =>
   String(num).padStart(places, "0")
 
-export const getMediaUrl = (path: string) => {
-  const host = localStorage.getItem("WEBDAV_HOST") || "http://127.0.0.1:8080"
-  return `${host}/${path}`
-}
-
 export const getParams = (fullPath: string) => {
   const parts = fullPath.replace(/^\/|\/$/g, "").split("/")
 

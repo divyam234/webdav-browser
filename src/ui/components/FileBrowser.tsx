@@ -38,7 +38,7 @@ const MyFileBrowser = () => {
 
   const params = route.useParams()
 
-  const { webdav } = route.useRouteContext()
+  const { webdav, settings } = route.useRouteContext()
 
   const path = extractPathParts(params._splat)
 
@@ -60,7 +60,11 @@ const MyFileBrowser = () => {
     open: false,
   })
 
-  const { chonkyActionHandler } = useFileAction(setModalState, path)
+  const { chonkyActionHandler } = useFileAction(
+    setModalState,
+    path,
+    settings[0].host
+  )
 
   useEffect(() => {
     if (firstRender) {
@@ -117,6 +121,7 @@ const MyFileBrowser = () => {
       {modalState.operation === ChonkyActions.OpenFiles.id &&
         modalState.open && (
           <PreviewModal
+            host={settings[0].host}
             files={files}
             currentFile={modalState.file!}
             modalState={modalState}

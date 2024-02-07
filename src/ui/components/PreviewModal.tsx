@@ -1,4 +1,4 @@
-import { lazy, memo, Suspense, useCallback, useMemo, useState } from "react"
+import { lazy, memo, Suspense, useCallback, useState } from "react"
 import { ModalState, SetValue } from "@/types"
 import {
   ChonkyIconFA,
@@ -17,7 +17,6 @@ import IconButton from "@mui/material/IconButton"
 import Modal from "@mui/material/Modal"
 import Typography from "@mui/material/Typography"
 
-import { getMediaUrl } from "@/ui/utils/common"
 import { preview } from "@/ui/utils/previewType"
 
 import Loader from "./Loader"
@@ -40,6 +39,7 @@ type PreviewModalProps = {
   modalState: Partial<ModalState>
   setModalState: SetValue<ModalState>
   files?: FileData[]
+  host: string
 }
 
 const findNext = (files: FileData[], fileId: string, previewType: string) => {
@@ -97,6 +97,7 @@ export default memo(function PreviewModal({
   files,
   modalState,
   setModalState,
+  host,
 }: PreviewModalProps) {
   const [previewFile, setPreviewFile] = useState(currentFile)
 
@@ -128,10 +129,7 @@ export default memo(function PreviewModal({
     setModalState((prev) => ({ ...prev, open: false }))
   }, [])
 
-  const mediaUrl = useMemo(
-    () => getMediaUrl(previewFile.path),
-    [previewFile.path]
-  )
+  const mediaUrl = `${host}${previewFile.path}`
 
   const renderPreview = useCallback(() => {
     if (previewType) {

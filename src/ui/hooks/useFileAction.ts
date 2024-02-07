@@ -8,7 +8,7 @@ import {
   MapFileActionsToData,
 } from "@bhunter179/chonky"
 
-import { getMediaUrl, navigateToExternalUrl } from "@/ui/utils/common"
+import { navigateToExternalUrl } from "@/ui/utils/common"
 import { preview } from "@/ui/utils/previewType"
 import { usePreloadFiles } from "@/ui/utils/queryOptions"
 
@@ -76,7 +76,8 @@ export const CustomActions = {
 
 export const useFileAction = (
   setModalState: SetValue<ModalState>,
-  path: string
+  path: string,
+  host: string
 ) => {
   const preloadFiles = usePreloadFiles()
 
@@ -105,17 +106,18 @@ export const useFileAction = (
           const { selectedFiles } = data.state
           for (const file of selectedFiles) {
             if (!file.isDir) {
-              navigateToExternalUrl(getMediaUrl(file.path), false)
+              navigateToExternalUrl(`${host}${file.path}`, false)
             }
           }
           break
         }
         case CustomActions.OpenInVLCPlayer.id: {
           const { selectedFiles } = data.state
-          const url = `vlc://${getMediaUrl(selectedFiles[0].path)}`
+          const url = `vlc://${host}${selectedFiles[0].path}`
           navigateToExternalUrl(url, false)
           break
         }
+
         case CustomActions.RenameFile.id: {
           setModalState({
             open: true,
@@ -145,7 +147,7 @@ export const useFileAction = (
           let clipboardText = ""
           selections.forEach((element) => {
             if (!element.isDir) {
-              clipboardText = `${clipboardText}${getMediaUrl(element.path)}\n`
+              clipboardText = `${clipboardText}${host}${element.path}\n`
             }
           })
           navigator.clipboard.writeText(clipboardText)
@@ -155,7 +157,7 @@ export const useFileAction = (
           break
       }
     },
-    [path]
+    [path, host]
   )
 
   return { chonkyActionHandler }
